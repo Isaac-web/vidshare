@@ -4,6 +4,7 @@ import {
   Image,
   TouchableOpacity,
   RefreshControl,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { icons } from '@/constants';
@@ -11,10 +12,11 @@ import AppStatusBar from '@/components/app-status-bar';
 import InfoBox from '@/components/info-box';
 import { useGlobalContext } from '@/context/global-context';
 import useAppwrite from '@/hooks/useAppwrite';
-import { fetchUserPosts } from '@/lib/appwrite';
+import { fetchUserPosts, signOut } from '@/lib/appwrite';
 import ProfileVideoTile from '@/components/profile-video-tile';
 import { Post } from '@/types';
 import { useState } from 'react';
+import { router } from 'expo-router';
 
 const Profile = () => {
   const { globalContext } = useGlobalContext();
@@ -24,10 +26,23 @@ const Profile = () => {
     fetchUserPosts(globalContext?.user?.$id as string)
   );
 
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      globalContext?.setIsLoggedIn(false);
+      globalContext?.setUser(null);
+
+      router.replace('/sigin-in');
+    } catch {
+      Alert.alert('Something went wrong during logout.');
+    }
+  };
+
   const handleRefresh = async () => {
     setIsRefreshing(true);
     await refetch();
     setIsRefreshing(false);
+    setIsRefreshing(true);
   };
 
   return (
@@ -46,7 +61,10 @@ const Profile = () => {
         ListHeaderComponent={() => (
           <View className="px-4 py-4 mt-5 mb-16">
             <View className="items-end">
-              <TouchableOpacity className="h-12 w-12 bg-black-100/50 justify-center items-center rounded-lg">
+              <TouchableOpacity
+                className="h-12 w-12 bg-black-100/50 justify-center items-center rounded-lg"
+                onPress={handleLogout}
+              >
                 <Image
                   className="h-6 w-6"
                   resizeMode="contain"
@@ -72,7 +90,11 @@ const Profile = () => {
             </View>
 
             <View className="flex-row justify-center items-center gap-x-28 mt-7">
-              <InfoBox title="10" subtitle="Posts" titleStyles="text-xl" />
+              <InfoBox
+                title={posts.length.toString()}
+                subtitle="Posts"
+                titleStyles="text-xl"
+              />
               <InfoBox title="1.2k" subtitle="Views" titleStyles="text-xl" />
             </View>
           </View>

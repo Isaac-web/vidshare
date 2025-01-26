@@ -12,24 +12,33 @@ import { images } from '@/constants';
 import { useState } from 'react';
 import AppButton from '@/components/app-button';
 import { router } from 'expo-router';
-import { getCurrentUser, signIn } from '@/lib/appwrite';
+import { signIn } from '@/lib/appwrite';
+import { useGlobalContext } from '@/context/global-context';
+import { User } from '@/types';
 
 const SignIn = () => {
+  const { globalContext } = useGlobalContext();
   const [form, setForm] = useState({ email: '', password: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleLogin = async () => {
+    setIsSubmitting(true);
     if (!form.email)
       return Alert.alert('Vadition Error', 'Please enter a valid email.');
     if (!form.password) return Alert.alert('Error', 'Please enter a password.');
 
     try {
-      const user = await signIn(form.email, form.password);
-      console.log(user);
+      const user = (await signIn(form.email, form.password)) as unknown as User;
 
-      return;
-      // router.push('/home');
+      globalContext?.setUser(user);
+      globalContext?.setIsLoggedIn(true);
+      globalContext?.setIsLoading(false);
+
+      router.push('/home');
     } catch (err) {
       console.log(err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -76,6 +85,7 @@ const SignIn = () => {
           <AppButton
             title="Login"
             onPress={handleLogin}
+            isLoading={isSubmitting}
             containerStyles="mt-12"
           />
 

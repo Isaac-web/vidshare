@@ -28,10 +28,13 @@ const databases = new Databases(client);
 client.setEndpoint(endpoint).setProject(projectId).setPlatform(platform);
 
 export const signIn = async (email: string, password: string) => {
-  await account.deleteSession('current');
   await account.createEmailPasswordSession(email, password);
 
   return getCurrentUser();
+};
+
+export const signOut = () => {
+  return account.deleteSession('current');
 };
 
 export const getCurrentUser = async () => {
@@ -63,6 +66,16 @@ export const fetchUserPosts = async (userId: string) => {
     databaseId,
     videoCollectionId,
     [Query.equal('users', userId)]
+  );
+
+  return posts;
+};
+
+export const fetchLatestPosts = async () => {
+  const { documents: posts } = await databases.listDocuments(
+    databaseId,
+    videoCollectionId,
+    [Query.orderDesc('$createdAt'), Query.limit(7)]
   );
 
   return posts;

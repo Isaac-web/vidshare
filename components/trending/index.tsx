@@ -1,23 +1,22 @@
 import { View, Text, FlatList } from 'react-native';
 import React from 'react';
+import useAppwrite from '@/hooks/useAppwrite';
+import { fetchLatestPosts } from '@/lib/appwrite';
+import { Post } from '@/types';
+import TrendingPostCard from './trending-post-card';
 
-const data = [
-  { $id: '1', title: 'Trending 1' },
-  { $id: '2', title: 'Trending 2' },
-  { $id: '3', title: 'Trending 3' },
-  { $id: '4', title: 'Trending 4' },
-];
+type Props = {
+  posts: Post[];
+};
 
-const Trending = () => {
+const Trending = ({ posts }: Props) => {
   return (
     <FlatList
-      data={data}
+      data={posts}
       horizontal
       keyExtractor={(item) => item.$id}
       ItemSeparatorComponent={() => <View className="h-full w-3" />}
-      renderItem={({ item }) => (
-        <Text className="text-white/50">{item.title}</Text>
-      )}
+      renderItem={({ item }) => <TrendingPostCard post={item} />}
     />
   );
 };

@@ -1,25 +1,27 @@
-import { useState } from 'react';
-import { View, FlatList, Text, Image, RefreshControl } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { images } from '@/constants';
 import AppStatusBar from '@/components/app-status-bar';
 import SearchField from '@/components/search-input';
 import Trending from '@/components/trending';
 import VideoCard from '@/components/video-card';
+import { useState } from 'react';
+import { View, FlatList, Text, Image, RefreshControl } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { images } from '@/constants';
 import { useGlobalContext } from '@/context/global-context';
-import { fetchPosts } from '@/lib/appwrite';
-import { Post } from '@/types';
+import { fetchLatestPosts, fetchPosts } from '@/lib/appwrite';
 import useAppwrite from '@/hooks/useAppwrite';
+import { Post } from '@/types';
 
 const Home = () => {
   const { globalContext } = useGlobalContext();
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const { data: trendingPosts, refetch: refetchTrendingPosts } =
+    useAppwrite<Post>(fetchLatestPosts);
 
-  const { data: posts, refetch } = useAppwrite<Post>(fetchPosts);
+  const { data: posts, refetch: refetchPosts } = useAppwrite<Post>(fetchPosts);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    await refetch();
+    await Promise.all([refetchPosts(), refetchTrendingPosts()]);
     setIsRefreshing(false);
   };
 
@@ -61,8 +63,11 @@ const Home = () => {
               containerStyles="mt-7"
             />
 
-            <View className="mt-7">
-              <Trending />
+            <View className="mt-7 gap-y-2 mb-10">
+              <Text className="text-lg text-gray-100 font-semibold">
+                Trending videos
+              </Text>
+              <Trending posts={trendingPosts} />
             </View>
           </View>
         )}

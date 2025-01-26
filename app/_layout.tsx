@@ -3,6 +3,7 @@ import { useFonts } from 'expo-font';
 import { SplashScreen, Stack } from 'expo-router';
 import { GlobalContextProvider } from '@/context/global-context';
 import '../global.css';
+import AppStatusBar from '@/components/app-status-bar';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -36,7 +37,9 @@ const RootLayout = () => {
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="search/[query]" options={{ headerShown: false }} />
+        <Stack.Screen name="video" options={{ headerShown: false }} />
       </Stack>
+      <AppStatusBar />
     </GlobalContextProvider>
   );
 };
