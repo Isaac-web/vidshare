@@ -5,6 +5,8 @@ import AppStatusBar from '@/components/app-status-bar';
 import VideoCard from '@/components/video-card';
 import InfoBox from '@/components/info-box';
 import { useGlobalContext } from '@/context/global-context';
+import useAppwrite from '@/hooks/useAppwrite';
+import { fetchUserPosts } from '@/lib/appwrite';
 
 const data = [
   { $id: '1', label: 'Hello World 1' },
@@ -22,9 +24,7 @@ const Profile = () => {
         data={data}
         keyExtractor={(item) => item.$id}
         renderItem={({ item }) => (
-          <View className="px-4">
-            <VideoCard />
-          </View>
+          <View className="px-4">{/* <VideoCard post={} /> */}</View>
         )}
         ItemSeparatorComponent={() => <View className="w-full h-8" />}
         ListHeaderComponent={() => (

@@ -1,8 +1,19 @@
-import { View, TouchableOpacity, Image, Text } from 'react-native';
+import {
+  View,
+  TouchableOpacity,
+  Image,
+  Text,
+  ImageBackground,
+} from 'react-native';
 import React from 'react';
-import { icons, images } from '@/constants';
+import { icons } from '@/constants';
+import { Post } from '@/types';
 
-const VideoCard = () => {
+type Props = {
+  post: Post;
+};
+
+const VideoCard = ({ post }: Props) => {
   return (
     <>
       <View className="gap-y-4">
@@ -10,20 +21,20 @@ const VideoCard = () => {
           <View className="flex-row gap-3">
             <View className="w-14 h-14 rounded-lg border-2 border-secondary justify-center items-center">
               <Image
-                source={images.logoSmall}
+                source={{ uri: post.users.avatar }}
                 className="w-[95%] h-[95%]"
                 resizeMode="cover"
               />
             </View>
             <View className="">
               <Text className="text-white font-psemibold" numberOfLines={1}>
-                Woman walks down a Tokyo
+                {post.title}
               </Text>
               <Text
                 className="text-gray-100 font-pregular text-sm"
                 numberOfLines={1}
               >
-                Brandon Etter
+                {post.users.username}
               </Text>
             </View>
           </View>
@@ -33,7 +44,14 @@ const VideoCard = () => {
           </TouchableOpacity>
         </View>
 
-        <View className="w-full h-64 bg-black-100 rounded-xl" />
+        <TouchableOpacity activeOpacity={0.7}>
+          <ImageBackground
+            className="w-full h-64 bg-black-100 rounded-lg overflow-hidden justify-center items-center"
+            source={{ uri: post.thumbnail }}
+          >
+            <Image source={icons.play} className="w-16 h-16" />
+          </ImageBackground>
+        </TouchableOpacity>
       </View>
     </>
   );

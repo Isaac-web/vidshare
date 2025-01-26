@@ -57,3 +57,13 @@ export const fetchPosts = async () => {
 
   return posts;
 };
+
+export const fetchUserPosts = async (userId: string) => {
+  const { documents: posts } = await databases.listDocuments(
+    databaseId,
+    videoCollectionId,
+    [Query.equal('users', userId)]
+  );
+
+  return posts;
+};

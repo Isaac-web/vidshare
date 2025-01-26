@@ -1,5 +1,5 @@
+import { useState } from 'react';
 import { View, FlatList, Text, Image, RefreshControl } from 'react-native';
-import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { images } from '@/constants';
 import AppStatusBar from '@/components/app-status-bar';
@@ -28,9 +28,9 @@ const Home = () => {
       <FlatList
         data={posts}
         keyExtractor={(item) => item.$id}
-        renderItem={({ item }) => (
+        renderItem={({ item: post }) => (
           <View className="px-4">
-            <VideoCard />
+            <VideoCard post={post} />
           </View>
         )}
         ItemSeparatorComponent={() => <View className="w-full h-8" />}
