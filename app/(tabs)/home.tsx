@@ -1,5 +1,5 @@
-import { View, FlatList, Text, Image, Alert } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import { View, FlatList, Text, Image, RefreshControl } from 'react-native';
+import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { images } from '@/constants';
 import AppStatusBar from '@/components/app-status-bar';
@@ -9,27 +9,19 @@ import VideoCard from '@/components/video-card';
 import { useGlobalContext } from '@/context/global-context';
 import { fetchPosts } from '@/lib/appwrite';
 import { Post } from '@/types';
+import useAppwrite from '@/hooks/useAppwrite';
 
 const Home = () => {
   const { globalContext } = useGlobalContext();
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: posts, refetch } = useAppwrite<Post>(fetchPosts);
 
-  const handleFetchData = async () => {
-    try {
-      const data = (await fetchPosts()) as unknown as Post[];
-      setPosts(data);
-    } catch (err) {
-      Alert.alert('Load Error', 'An error occured while loading posts.');
-    } finally {
-      setIsLoading(false);
-    }
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await refetch();
+    setIsRefreshing(false);
   };
-
-  useEffect(() => {
-    handleFetchData();
-  }, []);
 
   return (
     <SafeAreaView className="h-full bg-primary">
@@ -75,6 +67,9 @@ const Home = () => {
           </View>
         )}
         ListFooterComponent={() => <View className="h-10 w-full" />}
+        refreshControl={
+          <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />
+        }
       />
       <AppStatusBar />
     </SafeAreaView>
