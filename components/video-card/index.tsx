@@ -8,12 +8,21 @@ import {
 import React from 'react';
 import { icons } from '@/constants';
 import { Post } from '@/types';
+import { useGlobalContext } from '@/context/global-context';
+import { router } from 'expo-router';
 
 type Props = {
   post: Post;
 };
 
 const VideoCard = ({ post }: Props) => {
+  const { globalContext } = useGlobalContext();
+
+  const handlePlayVideo = () => {
+    globalContext?.setCurrentVideoSource(post.video);
+    router.push('/video');
+  };
+
   return (
     <>
       <View className="gap-y-4">
@@ -44,7 +53,7 @@ const VideoCard = ({ post }: Props) => {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity activeOpacity={0.7}>
+        <TouchableOpacity activeOpacity={0.7} onPress={handlePlayVideo}>
           <ImageBackground
             className="w-full h-64 bg-black-100 rounded-lg overflow-hidden justify-center items-center"
             source={{ uri: post.thumbnail }}

@@ -3,20 +3,27 @@ import React from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { useVideoPlayer, VideoView } from 'expo-video';
-import { useEvent } from 'expo';
+import { useGlobalContext } from '@/context/global-context';
 
 const videoSource =
   'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
 
 const VideoScreen = () => {
-  const player = useVideoPlayer(videoSource, (player) => {
-    player.loop = true;
-    player.play();
-  });
+  const { globalContext } = useGlobalContext();
+  const player = useVideoPlayer(
+    // globalContext?.currentVideoSource as string,
+    videoSource,
+    (player) => {
+      player.loop = true;
+      player.play();
+    }
+  );
 
   // const { isPlaying } = useEvent(player, 'playingChange', {
   //   isPlaying: player.playing,
   // });
+
+  if (!globalContext?.currentVideoSource) return;
 
   return (
     <SafeAreaView className="bg-black h-full">

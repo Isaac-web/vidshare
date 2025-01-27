@@ -3,14 +3,21 @@ import { View, Image, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Text } from 'react-native';
 import { router } from 'expo-router';
+import { useGlobalContext } from '@/context/global-context';
 
 type Props = {
   post: Post;
 };
 
 const TrendingPostCard = ({ post }: Props) => {
+  const { globalContext } = useGlobalContext();
+  const handlePlayVideo = () => {
+    globalContext?.setCurrentVideoSource(post.video);
+    router.push('/video');
+  };
+
   return (
-    <TouchableOpacity activeOpacity={0.7} onPress={() => router.push('/video')}>
+    <TouchableOpacity activeOpacity={0.7} onPress={handlePlayVideo}>
       <View
         style={{ height: 220, width: 130 }}
         className="rounded-lg overflow-hidden relative"
