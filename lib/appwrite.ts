@@ -1,4 +1,16 @@
-import { Account, Client, Databases, Query } from 'react-native-appwrite';
+import {
+  Account,
+  Client,
+  Databases,
+  ID,
+  Models,
+  Query,
+  Storage,
+  UploadProgress,
+} from 'react-native-appwrite';
+import { ImagePickerAsset } from 'expo-image-picker';
+import { convertImagePickerAssetToFile } from './helper';
+import { CreatePostFormType } from '@/types';
 
 const config = {
   endpoint: 'https://cloud.appwrite.io/v1',
@@ -24,6 +36,7 @@ const {
 const client = new Client();
 const account = new Account(client);
 const databases = new Databases(client);
+const storage = new Storage(client);
 
 client.setEndpoint(endpoint).setProject(projectId).setPlatform(platform);
 
@@ -35,6 +48,83 @@ export const signIn = async (email: string, password: string) => {
 
 export const signOut = () => {
   return account.deleteSession('current');
+};
+
+const getFileUrl = (file: Models.File) => {
+  if (!file) throw new Error('File cannot be undefined.');
+
+  let url;
+  try {
+    if (file.mimeType.startsWith('image'))
+      url = storage.getFilePreview(storageId, file.$id);
+    else if (file.mimeType.startsWith('video'))
+      url = storage.getFileView(storageId, file.$id);
+
+    return url?.toString();
+  } catch (err) {
+    throw new Error('Something went wrong while getting file url.');
+  }
+};
+
+export const uploadFile = async (
+  file: ImagePickerAsset,
+  progressCallback?: (progress: UploadProgress) => void
+) => {
+  const newFile = await convertImagePickerAssetToFile(file);
+
+  if (!newFile) return;
+
+  const uploadedFile = await storage.createFile(
+    storageId,
+    ID.unique(),
+    {
+      name: file.fileName as string,
+      size: newFile.size,
+      type: newFile.type,
+      uri: file.uri,
+    },
+    undefined,
+    progressCallback
+  );
+
+  return getFileUrl(uploadedFile);
+};
+
+export const createPost = async (
+  data: CreatePostFormType,
+  callbacks?: {
+    onVideoUploadProgress?: (progress: number) => void;
+    onThumbnailUploadProgress?: (progress: number) => void;
+  }
+) => {
+  if (!data.title || !data.thumbnail || !data.video || !data.prompt)
+    throw new Error('Please fill in missing fields.');
+
+  if (data.thumbnail) {
+    const [thumbnailUrl, videoUrl] = await Promise.all([
+      uploadFile(data.thumbnail, ({ progress }) =>
+        callbacks?.onThumbnailUploadProgress?.(progress)
+      ),
+      uploadFile(data.video, ({ progress }) =>
+        callbacks?.onVideoUploadProgress?.(progress)
+      ),
+    ]);
+
+    const newPost = await databases.createDocument(
+      databaseId,
+      videoCollectionId,
+      ID.unique(),
+      {
+        title: data.title,
+        prompt: data.prompt,
+        thumbnail: thumbnailUrl,
+        video: videoUrl,
+        users: data.userId,
+      }
+    );
+
+    return newPost;
+  }
 };
 
 export const getCurrentUser = async () => {

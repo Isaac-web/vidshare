@@ -14,6 +14,7 @@ type Props = {
   placeholder?: string;
   label?: string;
   keyboardType?: KeyboardTypeOptions;
+  value?: string;
   onChangeText(value: string): void;
   isSecure?: boolean;
 };
@@ -24,6 +25,7 @@ const TextField = ({
   isSecure,
   keyboardType = 'default',
   placeholder,
+  value,
   onChangeText,
 }: Props) => {
   const [showContent, setShowContent] = useState(false);
@@ -36,6 +38,7 @@ const TextField = ({
         <TextInput
           className="flex-1 font-pregular text-white"
           placeholder={placeholder}
+          value={value}
           placeholderTextColor={'#7B7B8B'}
           keyboardType={keyboardType}
           secureTextEntry={isSecure && !showContent}

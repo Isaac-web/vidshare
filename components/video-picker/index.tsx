@@ -13,20 +13,19 @@ type Props = {
   label?: string;
   containerStyles?: string;
   value?: string;
-  onImageChange(image: ImagePicker.ImagePickerAsset): void;
+  onVideoChange(image: ImagePicker.ImagePickerAsset): void;
 };
 
 const VideoPicker = ({
   containerStyles,
   label,
   value,
-  onImageChange,
+  onVideoChange: onImageChange,
 }: Props) => {
-  const handlePickImage = async () => {
+  const handlePickVideo = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: 'videos',
       allowsEditing: false,
-      aspect: [4, 4],
       quality: 1,
     });
 
@@ -39,11 +38,12 @@ const VideoPicker = ({
     <View className={containerStyles}>
       {label && <Text className="font-pregular text-gray-100">{label}</Text>}
       <TouchableOpacity
-        onPress={handlePickImage}
+        onPress={handlePickVideo}
         className="rounded-xl overflow-hidden"
       >
         <ImageBackground
           source={{ uri: value }}
+          resizeMode="cover"
           className={`justify-center items-center h-[220px] w-full bg-black-100`}
         >
           <View className="items-center justify-center border border-dashed border-secondary-100 h-16 w-16 rounded-lg">
